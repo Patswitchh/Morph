@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MORPH — Shifting Tic-Tac-Toe</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
 /* ===== ROOT VARIABLES ===== */
 :root {
@@ -800,42 +799,41 @@ input.code-input {
 <!-- ============================================================
      JAVASCRIPT
      ============================================================ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue }
+                         from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+try {
+  const app = initializeApp({
+    apiKey:            "AIzaSyBT02GxpsAllJqpSLYCzaWpM7COFdyPjcc",
+    authDomain:        "morph-game-6f202.firebaseapp.com",
+    databaseURL:       "https://morph-game-6f202-default-rtdb.firebaseio.com",
+    projectId:         "morph-game-6f202",
+    storageBucket:     "morph-game-6f202.firebasestorage.app",
+    messagingSenderId: "997037274025",
+    appId:             "1:997037274025:web:063ba32ecdb1bc1e3dcab8"
+  });
+  const _db = getDatabase(app);
+  window._fb = { db: _db, ref, set, get, update, on: onValue, ready: true };
+} catch(e) {
+  console.warn("Firebase init failed:", e.message);
+  window._fb = { ready: false };
+}
+</script>
+
 <script>
-/* ============================================================
-   FIREBASE CONFIG — REPLACE WITH YOUR OWN
-   ============================================================
-   1. Go to https://console.firebase.google.com
-   2. Create a project (free)
-   3. Add a Web App
-   4. Copy the config object and paste it below
-   5. In Firebase console → Realtime Database → Create database
-      (choose "Start in test mode" for now)
-   ============================================================ */
-const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyBT02GxpsAllJqpSLYCzaWpM7COFdyPjcc",
-  authDomain:        "morph-game-6f202.firebaseapp.com",
-  databaseURL:       "https://morph-game-6f202-default-rtdb.firebaseio.com",
-  projectId:         "morph-game-6f202",
-  storageBucket:     "morph-game-6f202.firebasestorage.app",
-  messagingSenderId: "997037274025",
-  appId:             "1:997037274025:web:063ba32ecdb1bc1e3dcab8"
-};
+// Firebase helpers — thin wrappers around window._fb set by module above
+// Called only after DOMContentLoaded so the module has time to run
+function _fbReady()      { return window._fb && window._fb.ready; }
+function _fbRef(path)    { return window._fb.ref(window._fb.db, path); }
+function _fbSet(r,v)     { return window._fb.set(r,v); }
+function _fbGet(r)       { return window._fb.get(r); }
+function _fbUpdate(r,v)  { return window._fb.update(r,v); }
+function _fbOn(r,cb)     { return window._fb.on(r,cb); }
 
-// ── Firebase init ──────────────────────────────────────────
-let db = null;
-let fbReady = false;
-
-(function initFirebase() {
-  try {
-    if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") return;
-    firebase.initializeApp(FIREBASE_CONFIG);
-    db = firebase.database();
-    fbReady = true;
-  } catch(e) { console.warn('Firebase init failed:', e.message); }
-})();
 
 function checkFb() {
-  if (!fbReady) {
+  if (!_fbReady()) {
     document.getElementById('firebaseWarning').style.display = '';
     return false;
   }
@@ -1304,7 +1302,7 @@ async function createGame() {
   document.getElementById('createStatus').className = 'status-msg';
 
   try {
-    await db.ref(`games/${code}`).set({
+    await _fbSet(_fbRef(`games/${code}`), {
       hostName: name, guestName: '',
       status: 'waiting', turn: 'X',
       board: {}, xQ: {}, oQ: {},
@@ -1348,12 +1346,12 @@ async function joinGame() {
   setStatus('joinStatus', 'Connecting…', '');
 
   try {
-    const snap = await db.ref(`games/${code}`).once('value');
+    const snap = await _fbGet(_fbRef(`games/${code}`));
     const data = snap.val();
     if (!data) { setStatus('joinStatus', 'Game not found', 'err'); return; }
     if (data.status !== 'waiting') { setStatus('joinStatus', 'Game already in progress', 'err'); return; }
 
-    await db.ref(`games/${code}`).update({ guestName: name });
+    await _fbUpdate(_fbRef(`games/${code}`), { guestName: name });
 
     mySlot = 'guest';
     G.myRole = 'O';
@@ -1381,20 +1379,20 @@ async function joinGame() {
 // ── Host starts game ───────────────────────────────────────
 async function hostStartGame() {
   if (!gameRef) return;
-  await gameRef.update({ status: 'playing' });
+  await _fbUpdate(gameRef, { status: 'playing' });
 }
 
 // ── Listen to Firebase game ────────────────────────────────
 function listenGame(code) {
   cleanupListeners();
-  gameRef = db.ref(`games/${code}`);
+  gameRef = _fbRef(`games/${code}`);
 
-  const unsubscribe = gameRef.on('value', snap => {
+  const unsub = _fbOn(gameRef, snap => {
     const d = snap.val();
     if (!d) return;
     onGameData(d);
   });
-  fbListeners.push({ ref: gameRef, cb: unsubscribe });
+  fbListeners.push(unsub);
 }
 
 function onGameData(d) {
@@ -1485,14 +1483,14 @@ async function pushOnlineMove(idx) {
   xQ.forEach((v,i) => { xQObj[i] = v; });
   oQ.forEach((v,i) => { oQObj[i] = v; });
 
-  const update = {
+  const update_data = {
     board: boardObj, xQ: xQObj, oQ: oQObj,
     turn: nextTurn,
     [`${p === 'X' ? 'x' : 'o'}Seq`]: seq,
   };
-  if (winner) { update.status = 'finished'; update.winner = winner; }
+  if (winner) { update_data.status = 'finished'; update_data.winner = winner; }
 
-  await gameRef.update(update);
+  await _fbUpdate(gameRef, update_data);
   sound('place');
   if (removed !== null) sound('remove');
 }
@@ -1500,8 +1498,8 @@ async function pushOnlineMove(idx) {
 // ── Leave lobby ────────────────────────────────────────────
 function leaveLobby() {
   if (gameRef && mySlot === 'host') {
-    gameRef.once('value').then(s => {
-      if (s.val() && s.val().status === 'waiting') gameRef.remove();
+    _fbGet(gameRef).then(s => {
+      if (s.val() && s.val().status === 'waiting') _fbSet(gameRef, null);
     });
   }
   document.getElementById('startBtn').style.display = '';
@@ -1516,7 +1514,7 @@ function cleanupOnline() {
 }
 
 function cleanupListeners() {
-  fbListeners.forEach(({ ref, cb }) => ref.off('value', cb));
+  fbListeners.forEach(unsub => unsub());
   fbListeners = [];
 }
 
@@ -1529,7 +1527,7 @@ function setStatus(id, msg, cls) {
 
 // ── Online screen: check Firebase on open ─────────────────
 document.getElementById('sOnline').addEventListener('animationstart', () => {
-  document.getElementById('firebaseWarning').style.display = fbReady ? 'none' : '';
+  document.getElementById('firebaseWarning').style.display = _fbReady() ? 'none' : '';
 });
 
 // Code input: digits only
