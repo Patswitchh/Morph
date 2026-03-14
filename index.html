@@ -24,6 +24,27 @@
   --glow-a: 0 0 12px #6c3bff80;
 }
 
+body.light {
+  --bg:    #f0f0f8;
+  --bg2:   #e2e2ef;
+  --bg3:   #d0d0e4;
+  --bg4:   #c0c0d8;
+  --x:     #0088cc;
+  --o:     #cc1144;
+  --text:  #1a1a2e;
+  --dim:   #8888aa;
+  --accent:#5522cc;
+  --ok:    #008844;
+  --glow-x: 0 0 8px #0088cc60;
+  --glow-o: 0 0 8px #cc114460;
+  --glow-a: 0 0 8px #5522cc60;
+}
+body.light::before { background:
+  linear-gradient(rgba(0,136,204,0.04) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(0,136,204,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
 /* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -729,16 +750,14 @@ input.code-input {
       <div class="stat-lbl">Win Rate</div>
     </div>
   </div>
-  <div style="height:4px"></div>
-  <button class="btn danger small" onclick="resetStats()">Reset Stats</button>
-  <div class="status-msg" style="margin-top:16px">Stats are tracked for Online Duels only</div>
+  <div class="status-msg" style="margin-top:8px">Stats are tracked for Online Duels only</div>
 </div>
 
 <!-- ============================================================
      SETTINGS
      ============================================================ -->
 <div class="screen" id="sSettings">
-  <button class="back-btn" onclick="nav('sHome')">← Back</button>
+  <button class="back-btn" id="settingsBack" onclick="settingsGoBack()">← Back</button>
   <div class="screen-title">Settings</div>
   <div class="scroll-area" style="max-height:none">
     <div class="setting-row">
@@ -767,21 +786,22 @@ input.code-input {
         <div class="setting-desc">Fade out piece about to be removed</div>
       </div>
       <label class="toggle">
-        <input type="checkbox" id="setGhost" onchange="saveSetting('ghost', this.checked)" checked>
+        <input type="checkbox" id="setGhost" onchange="saveSetting('ghost', this.checked)">
         <span class="t-track"></span>
       </label>
     </div>
     <div class="setting-row">
       <div>
-        <div class="setting-lbl">Move Order Numbers</div>
-        <div class="setting-desc">Show which move number each piece is</div>
+        <div class="setting-lbl">Light Mode</div>
+        <div class="setting-desc">Switch to light colour theme</div>
       </div>
       <label class="toggle">
-        <input type="checkbox" id="setNums" onchange="saveSetting('nums', this.checked)">
+        <input type="checkbox" id="setLight" onchange="saveSetting('light', this.checked)">
         <span class="t-track"></span>
       </label>
     </div>
   </div>
+  <div style="margin-top:24px;text-align:center;font-size:0.62rem;letter-spacing:0.18em;color:var(--dim)">VERSION 1.0.0</div>
 </div>
 
 <!-- ============================================================
@@ -792,6 +812,18 @@ input.code-input {
   <div class="go-sub" id="goSub"></div>
   <div class="go-btns">
     <button class="btn primary" onclick="playAgain()">Play Again</button>
+    <button class="btn" id="rematchBtn" onclick="requestRematch()" style="display:none">Rematch</button>
+    <button class="btn" onclick="goMenu()">Main Menu</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     DISCONNECT OVERLAY
+     ============================================================ -->
+<div class="go-overlay" id="dcOverlay">
+  <div class="go-title" style="font-size:1.6rem;color:var(--o);text-shadow:var(--glow-o)">DISCONNECTED</div>
+  <div class="go-sub">Opponent left the game</div>
+  <div class="go-btns">
     <button class="btn" onclick="goMenu()">Main Menu</button>
   </div>
 </div>
@@ -841,7 +873,7 @@ function checkFb() {
 }
 
 // ── Settings ───────────────────────────────────────────────
-const DEF_SETTINGS = { sound: true, anim: true, ghost: true, nums: false };
+const DEF_SETTINGS = { sound: true, anim: true, ghost: false, light: false };
 let S = { ...DEF_SETTINGS };
 
 function loadSettings() {
@@ -849,12 +881,17 @@ function loadSettings() {
   document.getElementById('setSnd').checked   = S.sound;
   document.getElementById('setAnim').checked  = S.anim;
   document.getElementById('setGhost').checked = S.ghost;
-  document.getElementById('setNums').checked  = S.nums;
+  document.getElementById('setLight').checked = S.light;
+  applyTheme();
 }
 function saveSetting(k, v) {
   S[k] = v;
   try { localStorage.setItem('morph_s', JSON.stringify(S)); } catch(e) {}
+  if (k === 'light') applyTheme();
   if (document.getElementById('sGame').classList.contains('active')) renderBoard();
+}
+function applyTheme() {
+  document.body.classList.toggle('light', !!S.light);
 }
 
 // ── Stats ──────────────────────────────────────────────────
@@ -959,10 +996,21 @@ function showToast(msg, dur = 1600) {
 }
 
 // ── Screen nav ─────────────────────────────────────────────
+let prevScreen = 'sHome';
 function nav(id) {
+  const current = document.querySelector('.screen.active');
+  if (current) prevScreen = current.id;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'sStats') renderStats();
+}
+function settingsGoBack() {
+  // If we came from the game, go back to game not home
+  if (prevScreen === 'sGame') {
+    nav('sGame');
+  } else {
+    nav('sHome');
+  }
 }
 
 // ── Game constants ─────────────────────────────────────────
@@ -1255,21 +1303,42 @@ function showGameOver(winner) {
     if (G.mode === 'online' && G.myRole) recordResult(G.myRole === 'O' ? 'win' : 'loss');
   }
 
+  document.getElementById('rematchBtn').style.display = G.mode === 'online' ? '' : 'none';
+  document.getElementById('rematchBtn').textContent = 'Rematch';
   document.getElementById('goOverlay').classList.add('show');
 }
 
 function playAgain() {
   document.getElementById('goOverlay').classList.remove('show');
-  if (G.mode === 'online') { goMenu(); return; }
   resetGame();
   sound('start');
 }
+async function requestRematch() {
+  if (!gameRef) return;
+  const btn = document.getElementById('rematchBtn');
+  if (btn.textContent === 'Accept Rematch') {
+    // Both want rematch — reset on Firebase
+    await _fbUpdate(gameRef, {
+      status: 'playing', turn: 'X',
+      board: {}, xQ: {}, oQ: {},
+      xSeq: 0, oSeq: 0, winner: null, rematch: 'accepted'
+    });
+  } else {
+    btn.textContent = 'Waiting…';
+    btn.disabled = true;
+    await _fbUpdate(gameRef, { rematch: mySlot });
+  }
+}
 function goMenu() {
   document.getElementById('goOverlay').classList.remove('show');
+  document.getElementById('dcOverlay').classList.remove('show');
   cleanupOnline();
   nav('sHome');
 }
 function confirmQuit() {
+  if (G.mode === 'online' && gameRef && G.status === 'playing') {
+    _fbUpdate(gameRef, { disconnected: true, disconnectedBy: mySlot }).catch(()=>{});
+  }
   cleanupOnline();
   nav('sHome');
 }
@@ -1350,6 +1419,7 @@ async function joinGame() {
     const data = snap.val();
     if (!data) { setStatus('joinStatus', 'Game not found', 'err'); return; }
     if (data.status !== 'waiting') { setStatus('joinStatus', 'Game already in progress', 'err'); return; }
+    if (data.guestName) { setStatus('joinStatus', 'Lobby is full', 'err'); return; }
 
     await _fbUpdate(_fbRef(`games/${code}`), { guestName: name });
 
@@ -1389,7 +1459,37 @@ function listenGame(code) {
 
   const unsub = _fbOn(gameRef, snap => {
     const d = snap.val();
-    if (!d) return;
+    if (!d) {
+      // Game deleted = opponent disconnected
+      if (document.getElementById('sGame').classList.contains('active') && G.status === 'playing') {
+        G.status = 'finished';
+        document.getElementById('dcOverlay').classList.add('show');
+        sound('error');
+      }
+      return;
+    }
+    // Detect opponent disconnect via presence flag
+    if (d.disconnected && document.getElementById('sGame').classList.contains('active') && G.status === 'playing') {
+      G.status = 'finished';
+      document.getElementById('dcOverlay').classList.add('show');
+      sound('error');
+      return;
+    }
+    // Rematch requested by opponent
+    if (d.rematch === 'accepted' && document.getElementById('sGame').classList.contains('active')) {
+      document.getElementById('goOverlay').classList.remove('show');
+      G.nameX = d.hostName; G.nameO = d.guestName;
+      document.getElementById('pNameX').textContent = G.nameX;
+      document.getElementById('pNameO').textContent = G.nameO;
+      resetGame();
+      return;
+    }
+    if (d.rematch && d.rematch !== 'accepted' && document.getElementById('goOverlay').classList.contains('show')) {
+      // Show rematch pending if opponent also wants one
+      if ((mySlot === 'host' && d.rematch === 'guest') || (mySlot === 'guest' && d.rematch === 'host')) {
+        document.getElementById('rematchBtn').textContent = 'Accept Rematch';
+      }
+    }
     onGameData(d);
   });
   fbListeners.push(unsub);
