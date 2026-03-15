@@ -27,6 +27,8 @@ body.light {
   --gx:0 0 6px #0077bb50; --go:0 0 6px #cc114450;
 }
 body.light::before { background: linear-gradient(rgba(0,119,187,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,119,187,0.04) 1px,transparent 1px); background-size:48px 48px; }
+body.scale-sm .screen, body.scale-sm .overlay, body.scale-sm #chatPanel, body.scale-sm #reactDisplay, body.scale-sm #promoOverlay { zoom:0.84; }
+body.scale-lg .screen, body.scale-lg .overlay, body.scale-lg #chatPanel, body.scale-lg #reactDisplay, body.scale-lg #promoOverlay { zoom:1.16; }
 
 /* ===== BASE ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -333,6 +335,38 @@ input.ci{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;lett
   .glh1{top:87.5px;} .glh2{top:175.5px;}
   .c4-cell{width:36px;height:36px;}
 }
+
+/* ===== CHESS ===== */
+.chess-outer{display:inline-flex;flex-direction:column;align-items:flex-start;}
+.chess-board-row{display:flex;align-items:center;}
+.chess-rank-col{display:flex;flex-direction:column;}
+.chess-rank-lbl{height:44px;display:flex;align-items:center;justify-content:center;width:16px;font-size:0.6rem;font-family:'Orbitron',sans-serif;font-weight:700;color:var(--dim);letter-spacing:.04em;}
+.chess-board{display:grid;grid-template-columns:repeat(8,44px);grid-template-rows:repeat(8,44px);border:1px solid var(--bg3);}
+.chess-file-row{display:flex;padding-left:16px;}
+.chess-file-lbl{width:44px;text-align:center;font-size:0.6rem;font-family:'Orbitron',sans-serif;font-weight:700;color:var(--dim);letter-spacing:.04em;margin-top:3px;}
+.csq{width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.csq-light{background:rgba(0,240,255,0.05);}
+.csq-dark{background:rgba(0,240,255,0.01);}
+body.light .csq-light{background:rgba(80,140,80,0.18);}
+body.light .csq-dark{background:rgba(60,110,60,0.08);}
+.csq-sel{background:rgba(0,240,255,0.22)!important;}
+.csq-lm{outline:2px solid rgba(255,190,0,0.35);outline-offset:-2px;}
+.csq-check{background:rgba(255,45,107,0.32)!important;}
+.cs-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:rgba(0,240,255,0.32);pointer-events:none;z-index:1;}
+.cs-ring{position:absolute;inset:3px;border-radius:50%;border:3px solid rgba(0,240,255,0.45);pointer-events:none;z-index:1;}
+.cs-piece{position:relative;z-index:2;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:transform .1s;}
+.cs-piece:hover{transform:scale(1.08);}
+.chess-controls{display:flex;gap:8px;margin-top:8px;justify-content:center;}
+.chess-status{font-size:0.82rem;font-weight:700;letter-spacing:.1em;text-align:center;padding:4px 0;color:var(--dim);}
+.chess-status.cs-check{color:var(--o);}
+/* Promotion */
+#promoOverlay{display:none;position:fixed;inset:0;z-index:120;background:rgba(5,5,15,0.92);flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+#promoOverlay.show{display:flex;}
+.promo-title{font-family:'Orbitron',sans-serif;font-size:0.88rem;letter-spacing:.2em;color:var(--dim);margin-bottom:16px;text-transform:uppercase;}
+.promo-choices{display:flex;gap:10px;}
+.promo-btn{width:62px;height:62px;background:var(--bg2);border:1px solid var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .17s;}
+.promo-btn:hover{border-color:var(--x);background:rgba(0,240,255,0.07);}
+
 </style>
 </head>
 <body>
@@ -371,7 +405,6 @@ input.ci{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;lett
   </div>
   <div class="logo">MORPH</div>
   <div class="logo-sub">Arcade</div>
-  <a class="hire-link" href="https://www.fiverr.com/patswitch" target="_blank" rel="noopener">Hire Me: <span>fiverr.com/patswitch</span></a>
   <div class="home-btns">
     <button class="home-btn" onclick="nav('sPickLocal')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 2H8l-1 5h10z"/><circle cx="12" cy="14" r="2"/></svg>
@@ -390,6 +423,7 @@ input.ci{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;lett
       <div class="home-btn-info"><div>Settings</div><div class="home-btn-sub">Audio, theme, scale and more</div></div>
     </button>
   </div>
+  <a class="hire-link" href="https://www.fiverr.com/patswitch" target="_blank" rel="noopener">Hire Me: <span>fiverr.com/patswitch</span></a>
 </div>
 
 <!-- GAME PICKER LOCAL -->
@@ -414,7 +448,6 @@ input.ci{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;lett
     <div class="mbtitle">SELECT MODE</div>
     <button class="btn p" onclick="startLocal()">Local — 2 Players</button>
     <button class="btn" onclick="nav('sBotDiff')">vs Bot</button>
-    <button class="btn" onclick="nav('sOnline')">Online Multiplayer</button>
     <button class="btn" onclick="nav('sTourSetup')">Tournament Mode</button>
   </div>
 </div>
@@ -555,6 +588,7 @@ input.ci{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;lett
     <button class="stab active" onclick="showStatTab('morph',this)">MORPH</button>
     <button class="stab" onclick="showStatTab('connect4',this)">C4</button>
     <button class="stab" onclick="showStatTab('dotsboxes',this)">D&amp;B</button>
+    <button class="stab" onclick="showStatTab('chess',this)">CHESS</button>
   </div>
   <div class="sgrid">
     <div class="scard"><div class="sval" id="stW">0</div><div class="slbl">Wins</div></div>
@@ -604,7 +638,7 @@ input.ci{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:700;lett
         <button class="scale-btn" id="scaleLg" onclick="setScale('lg')">LG</button>
       </div>
     </div>
-  <div class="ver">v1.2.0 &mdash; TTT Update</div>
+  <div class="ver">v1.3.6 &mdash; Chess Update</div>
 </div>
 
 <!-- ============================================================ TOURNAMENT SETUP ============================================================ -->
@@ -717,13 +751,15 @@ const GAME_DEFS = [
   {id:'morph',    name:'MORPH',        desc:'Shifting TTT — 4th piece removes your oldest'},
   {id:'ttt',      name:'TIC-TAC-TOE',  desc:'Classic 3x3 — first to 3 in a row wins'},
   {id:'connect4', name:'CONNECT 4',    desc:'Drop pieces — first to 4 in a row wins'},
-  {id:'dotsboxes',name:'DOTS & BOXES', desc:'Draw lines — complete boxes to score points'}
+  {id:'dotsboxes',name:'DOTS & BOXES', desc:'Draw lines — complete boxes to score points'},
+  {id:'chess',     name:'CHESS',         desc:'Full chess — every rule, custom pieces'}
 ];
 const GAME_ICONS = {
   morph:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="11" y1="1" x2="11" y2="31"/><line x1="21" y1="1" x2="21" y2="31"/><line x1="1" y1="11" x2="31" y2="11"/><line x1="1" y1="21" x2="31" y2="21"/><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/><circle cx="26" cy="6" r="3.5"/><line x1="23" y1="23" x2="29" y2="29"/><line x1="29" y1="23" x2="23" y2="29"/><circle cx="6" cy="26" r="3.5"/></svg>`,
   ttt:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="11" y1="1" x2="11" y2="31"/><line x1="21" y1="1" x2="21" y2="31"/><line x1="1" y1="11" x2="31" y2="11"/><line x1="1" y1="21" x2="31" y2="21"/><line x1="2" y1="2" x2="9" y2="9"/><line x1="9" y1="2" x2="2" y2="9"/><circle cx="26" cy="5.5" r="3.5"/></svg>`,
   connect4:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="9" width="30" height="22" rx="2"/><circle cx="7" cy="15" r="2.5"/><circle cx="13" cy="15" r="2.5"/><circle cx="19" cy="15" r="2.5"/><circle cx="25" cy="15" r="2.5"/><circle cx="7" cy="22" r="2.5"/><circle cx="13" cy="22" r="2.5" fill="currentColor"/><circle cx="19" cy="22" r="2.5" fill="currentColor"/><circle cx="25" cy="22" r="2.5"/></svg>`,
-  dotsboxes:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="5" r="2" fill="currentColor"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="27" cy="5" r="2" fill="currentColor"/><circle cx="5" cy="16" r="2" fill="currentColor"/><circle cx="16" cy="16" r="2" fill="currentColor"/><circle cx="27" cy="16" r="2" fill="currentColor"/><circle cx="5" cy="27" r="2" fill="currentColor"/><circle cx="16" cy="27" r="2" fill="currentColor"/><circle cx="27" cy="27" r="2" fill="currentColor"/><line x1="5" y1="5" x2="16" y2="5"/><line x1="16" y1="5" x2="16" y2="16"/><line x1="5" y1="16" x2="16" y2="16"/><line x1="5" y1="5" x2="5" y2="16"/></svg>`
+  dotsboxes:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="5" r="2" fill="currentColor"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="27" cy="5" r="2" fill="currentColor"/><circle cx="5" cy="16" r="2" fill="currentColor"/><circle cx="16" cy="16" r="2" fill="currentColor"/><circle cx="27" cy="16" r="2" fill="currentColor"/><circle cx="5" cy="27" r="2" fill="currentColor"/><circle cx="16" cy="27" r="2" fill="currentColor"/><circle cx="27" cy="27" r="2" fill="currentColor"/><line x1="5" y1="5" x2="16" y2="5"/><line x1="16" y1="5" x2="16" y2="16"/><line x1="5" y1="16" x2="16" y2="16"/><line x1="5" y1="5" x2="5" y2="16"/></svg>`,
+  chess:`<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="27" width="24" height="4" rx="1"/><rect x="8" y="23" width="16" height="4" rx="1"/><path d="M10 23 C10 15 13 13 16 11 C19 13 22 15 22 23"/><rect x="14" y="4" width="4" height="9" rx="1"/><rect x="10" y="6.5" width="12" height="4" rx="1"/><circle cx="16" cy="4" r="3"/></svg>`
 };
 function buildPickers() {
   ['Local','Online'].forEach(suffix => {
@@ -738,7 +774,7 @@ function buildPickers() {
 }
 function selectGameLocal(type) {
   APP.gameType=type;
-  const names={morph:'MORPH',ttt:'TIC-TAC-TOE',connect4:'CONNECT 4',dotsboxes:'DOTS & BOXES'};
+  const names={morph:'MORPH',ttt:'TIC-TAC-TOE',connect4:'CONNECT 4',dotsboxes:'DOTS & BOXES',chess:'CHESS'};
   document.getElementById('modeSTitle').textContent=names[type]||type;
   nav('sModeSelect');
 }
@@ -880,6 +916,18 @@ function sound(type) {
         g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.18,t+.05); g.gain.exponentialRampToValueAtTime(.001,t+.3);
         o.start(t); o.stop(t+.35);
       });
+    } else if(type==='chess') {
+      const o=ctx.createOscillator();o.connect(g);o.type='triangle';
+      o.frequency.setValueAtTime(440,now);o.frequency.exponentialRampToValueAtTime(320,now+.06);
+      g.gain.setValueAtTime(.17,now);g.gain.exponentialRampToValueAtTime(.001,now+.1);
+      o.start();o.stop(now+.12);
+    } else if(type==='check') {
+      [440,880].forEach((f,i)=>{
+        const o=ctx.createOscillator();o.connect(g);o.type='sine';o.frequency.value=f;
+        const t=now+i*.07;
+        g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.17,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+.2);
+        o.start(t);o.stop(t+.22);
+      });
     } else if(type==='dot') {
       const o=ctx.createOscillator(); o.connect(g);
       o.frequency.setValueAtTime(400,now); o.frequency.exponentialRampToValueAtTime(600,now+.05);
@@ -922,9 +970,7 @@ function selectGame(type) {
   const names = { morph:'MORPH', connect4:'CONNECT 4', dotsboxes:'DOTS & BOXES' };
   document.getElementById('modeSTitle').textContent = names[type]||type;
   // hide dots from morph-only dots display
-  const pd = document.getElementById('pDotsX').parentElement;
-  document.getElementById('pDotsX').style.display = type==='morph' ? 'flex' : 'none';
-  document.getElementById('pDotsO').style.display = type==='morph' ? 'flex' : 'none';
+
   nav('sModeSelect');
 }
 
@@ -1538,8 +1584,7 @@ function startBot(diff) {
 function initGame(nameX, nameO) {
   document.getElementById('pNameX').textContent=nameX;
   document.getElementById('pNameO').textContent=nameO;
-  document.getElementById('pDotsX').style.display=APP.gameType==='morph'?'flex':'none';
-  document.getElementById('pDotsO').style.display=APP.gameType==='morph'?'flex':'none';
+
   document.getElementById('goOverlay').classList.remove('show');
   document.getElementById('dcOverlay').classList.remove('show');
   document.getElementById('chatBtn').style.display='none';
@@ -1551,6 +1596,7 @@ function initGame(nameX, nameO) {
   else if(APP.gameType==='ttt') { tttReset(); tttRender(); }
   else if(APP.gameType==='connect4') { c4Reset(); c4Render(); }
   else if(APP.gameType==='dotsboxes') { dbReset(); dbRender(); }
+  else if(APP.gameType==='chess') { chessReset(); chessRender(); }
   refreshTurnBar();
   nav('sGame');
   sound('start');
@@ -1559,6 +1605,7 @@ function initGame(nameX, nameO) {
       if(APP.gameType==='ttt'){const m=tttBotMove();if(m!=null)tttApply(m,'O');}
       else if(APP.gameType==='connect4'){const m=c4BotMove();if(m!=null)c4Drop(m,'O');}
       else if(APP.gameType==='dotsboxes')dbBotMove();
+      else if(APP.gameType==='chess')chessBotMove();
     },500);
   }
 }
@@ -1567,15 +1614,17 @@ function currentTurn() {
   if(APP.gameType==='morph') return M.turn;
   if(APP.gameType==='ttt') return TTT.turn;
   if(APP.gameType==='connect4') return C4.turn;
+  if(APP.gameType==='chess') return CHESS.turn==='w'?'X':'O';
   return DB_STATE.turn;
 }
-function botTurn(){return (APP.mode==='bot'||TOUR_STATE?.isBot)&&currentTurn()==='O'&&currentStatus()==='playing';}
+function botTurn(){return (APP.mode==='bot'||TOUR_STATE?.isBot)&&currentTurn()==='O'&&currentStatus()==='playing'&&APP.gameType!=='chess'||((APP.mode==='bot'||TOUR_STATE?.isBot)&&APP.gameType==='chess'&&CHESS.turn==='b'&&currentStatus()==='playing');}
 function botDelay(){return 300+Math.random()*250;}
 
 function currentStatus() {
   if(APP.gameType==='morph') return M.status;
   if(APP.gameType==='ttt') return TTT.status;
   if(APP.gameType==='connect4') return C4.status;
+  if(APP.gameType==='chess') return (CHESS.status==='playing'||CHESS.status==='check')?'playing':'finished';
   return DB_STATE.status;
 }
 
@@ -1590,7 +1639,9 @@ function updateDots() {
   if(APP.gameType!=='morph') return;
   ['X','O'].forEach(p=>{
     const q=p==='X'?M.xQ:M.oQ;
-    const dots=document.getElementById(`pDots${p}`).querySelectorAll('.pd');
+    const el=document.getElementById(`pDots${p}`);
+    if(!el) return;
+    const dots=el.querySelectorAll('.pd');
     dots.forEach((d,i)=>{
       d.className='pd';
       if(i<q.length) {
@@ -1655,7 +1706,7 @@ function showGameOver(winner, override) {
 }
 
 function gameName() {
-  return {morph:'Morph',ttt:'Tic-Tac-Toe',connect4:'Connect 4',dotsboxes:'Dots & Boxes'}[APP.gameType]||APP.gameType;
+  return {morph:'Morph',ttt:'Tic-Tac-Toe',connect4:'Connect 4',dotsboxes:'Dots & Boxes',chess:'Chess'}[APP.gameType]||APP.gameType;
 }
 function modeLabel() {
   return {local:'Local',bot:'vs Bot',online:'Online'}[APP.mode]||APP.mode;
@@ -1888,7 +1939,7 @@ async function loadLobbyList() {
     if(!lobbies.length){el.innerHTML='<div class="lb-empty">No open lobbies</div>';return;}
     el.innerHTML=lobbies.map(l=>`
       <div class="lobby-item" onclick="joinLobby('${l.code}')">
-        <div class="li-game">${{morph:'MORPH',ttt:'TTT',connect4:'C4',dotsboxes:'D&B'}[l.gameType]||'?'}</div>
+        <div class="li-game">${{morph:'MORPH',ttt:'TTT',connect4:'C4',dotsboxes:'D&B',chess:'CHESS'}[l.gameType]||'?'}</div>
         <div class="li-host">${escHtml(l.hostName)}</div>
         <div class="li-join">JOIN</div>
       </div>
@@ -1905,10 +1956,13 @@ async function joinLobby(code) {
 }
 
 // Auto match
-async function autoMatch() {
-  if(!checkFb()){return;}
-  const name=prompt('Your name for auto-match?')||'Player';
-  setMsg('joinStatus','Searching…','');
+function autoMatch() {
+  if(!checkFb()) return;
+  document.getElementById('autoMatchOverlay').classList.add('show');
+}
+async function confirmAutoMatch() {
+  const name=document.getElementById('autoMatchName').value.trim()||'Player';
+  document.getElementById('autoMatchOverlay').classList.remove('show');
   try {
     const snap=await fbGet(fbRef('public_lobbies'));
     const data=snap.val();
@@ -1922,7 +1976,6 @@ async function autoMatch() {
         nav('sJoin'); joinGame(); return;
       }
     }
-    // No match found, create one
     document.getElementById('createName').value=name;
     document.getElementById('createPublic').checked=true;
     nav('sCreate'); createGame();
@@ -1965,6 +2018,7 @@ function listenGame(code) {
       else if(APP.gameType==='ttt'){tttReset();tttRender();}
       else if(APP.gameType==='connect4'){c4Reset();c4Render();}
       else if(APP.gameType==='dotsboxes'){dbReset();dbRender();}
+      else if(APP.gameType==='chess'){chessReset();chessRender();}
       refreshTurnBar(); return;
     }
     if(d.rematch&&d.rematch!=='accepted'&&document.getElementById('goOverlay').classList.contains('show')) {
@@ -1987,6 +2041,11 @@ function onGameData(d) {
   if(d.status==='playing'&&document.getElementById('sLobby').classList.contains('active')) {
     APP.gameType=d.gameType||APP.gameType;
     APP.mode='online';
+    if(APP.gameType==='chess'&&d.chessHostColor){
+      const isHost=ONLINE.mySlot==='host';
+      CHESS.myColor=isHost?d.chessHostColor:d.chessGuestColor;
+      CHESS.flipped=CHESS.myColor==='b';
+    }
     document.getElementById('pNameX').textContent=d.hostName;
     document.getElementById('pNameO').textContent=d.guestName;
     document.getElementById('chatBtn').style.display='';
@@ -2016,7 +2075,9 @@ function onGameData(d) {
 }
 
 function syncGameState(d) {
-  if(APP.gameType==='ttt') {
+  if(APP.gameType==='chess') {
+    syncChessState(d);return;
+  } else if(APP.gameType==='ttt') {
     const board=Array(9).fill(null);
     if(d.tttBoard)Object.entries(d.tttBoard).forEach(([k,v])=>{if(v)board[+k]=v;});
     TTT.board=board;TTT.turn=d.turn||'X';
@@ -2167,6 +2228,522 @@ loadSettings();
 loadStats();
 loadHistory();
 morphReset();
+
+// ═══════════════════════════════════════════════════════════════
+// CHESS ENGINE
+// ═══════════════════════════════════════════════════════════════
+// Board: 64 squares. idx = row*8+col
+// row 0 = rank 8 (black back), row 7 = rank 1 (white back)
+// col 0 = a-file, col 7 = h-file
+
+let CHESS = {};
+
+function csI(r,c){return r*8+c;}
+function csR(i){return Math.floor(i/8);}
+function csC(i){return i%8;}
+function csOK(r,c){return r>=0&&r<8&&c>=0&&c<8;}
+function csOpp(col){return col==='w'?'b':'w';}
+
+function chessReset(){
+  CHESS={
+    board:Array(64).fill(null),
+    turn:'w',
+    cast:{wK:true,wQ:true,bK:true,bQ:true},
+    ep:null,
+    halfMoves:0,
+    posHist:[],
+    sel:null,
+    lm:[],
+    lastFrom:-1,lastTo:-1,
+    status:'playing',
+    winner:null,
+    pendPromo:null,
+    flipped:false
+  };
+  const back=['R','N','B','Q','K','B','N','R'];
+  back.forEach((t,c)=>{
+    CHESS.board[csI(0,c)]={t,color:'b'};
+    CHESS.board[csI(7,c)]={t,color:'w'};
+  });
+  for(let c=0;c<8;c++){
+    CHESS.board[csI(1,c)]={t:'P',color:'b'};
+    CHESS.board[csI(6,c)]={t:'P',color:'w'};
+  }
+  CHESS.posHist.push(csBoardKey());
+}
+
+function csBoardKey(){
+  return CHESS.board.map(p=>p?p.color+p.t:'_').join('')+CHESS.turn+
+    (CHESS.cast.wK?'K':'')+( CHESS.cast.wQ?'Q':'')+
+    (CHESS.cast.bK?'k':'')+( CHESS.cast.bQ?'q':'')+
+    (CHESS.ep!==null?CHESS.ep:'_');
+}
+
+// ── Attack detection ──────────────────────────────────────────
+function csAttacked(sq,byColor,board){
+  const r=csR(sq),c=csC(sq);
+  const pd=byColor==='w'?1:-1;
+  for(const dc of[-1,1]){
+    if(csOK(r+pd,c+dc)){const p=board[csI(r+pd,c+dc)];if(p&&p.t==='P'&&p.color===byColor)return true;}
+  }
+  for(const[dr,dc]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){
+    if(csOK(r+dr,c+dc)){const p=board[csI(r+dr,c+dc)];if(p&&p.t==='N'&&p.color===byColor)return true;}
+  }
+  for(const[dr,dc]of[[0,1],[0,-1],[1,0],[-1,0]]){
+    let nr=r+dr,nc=c+dc;
+    while(csOK(nr,nc)){const p=board[csI(nr,nc)];if(p){if(p.color===byColor&&(p.t==='R'||p.t==='Q'))return true;break;}nr+=dr;nc+=dc;}
+  }
+  for(const[dr,dc]of[[1,1],[1,-1],[-1,1],[-1,-1]]){
+    let nr=r+dr,nc=c+dc;
+    while(csOK(nr,nc)){const p=board[csI(nr,nc)];if(p){if(p.color===byColor&&(p.t==='B'||p.t==='Q'))return true;break;}nr+=dr;nc+=dc;}
+  }
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+    if(dr===0&&dc===0)continue;
+    if(csOK(r+dr,c+dc)){const p=board[csI(r+dr,c+dc)];if(p&&p.t==='K'&&p.color===byColor)return true;}
+  }
+  return false;
+}
+
+function csInCheck(color,board){
+  const ki=board.findIndex(p=>p&&p.t==='K'&&p.color===color);
+  if(ki===-1)return false;
+  return csAttacked(ki,csOpp(color),board);
+}
+
+// ── Pseudo-legal moves ────────────────────────────────────────
+function csPseudo(idx,board,ep){
+  const p=board[idx];if(!p)return[];
+  const r=csR(idx),c=csC(idx),moves=[];
+  if(p.t==='P'){
+    const dir=p.color==='w'?-1:1;
+    const startR=p.color==='w'?6:1;
+    if(csOK(r+dir,c)&&!board[csI(r+dir,c)]){
+      moves.push({from:idx,to:csI(r+dir,c)});
+      if(r===startR&&!board[csI(r+2*dir,c)])
+        moves.push({from:idx,to:csI(r+2*dir,c),ep2:csI(r+dir,c)});
+    }
+    for(const dc of[-1,1]){
+      if(csOK(r+dir,c+dc)){
+        const tgt=board[csI(r+dir,c+dc)];
+        if(tgt&&tgt.color!==p.color)moves.push({from:idx,to:csI(r+dir,c+dc)});
+        if(ep===csI(r+dir,c+dc))moves.push({from:idx,to:csI(r+dir,c+dc),epCap:csI(r,c+dc)});
+      }
+    }
+  } else if(p.t==='N'){
+    for(const[dr,dc]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){
+      if(csOK(r+dr,c+dc)){const tgt=board[csI(r+dr,c+dc)];if(!tgt||tgt.color!==p.color)moves.push({from:idx,to:csI(r+dr,c+dc)});}
+    }
+  } else if(p.t==='K'){
+    for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+      if(dr===0&&dc===0)continue;
+      if(csOK(r+dr,c+dc)){const tgt=board[csI(r+dr,c+dc)];if(!tgt||tgt.color!==p.color)moves.push({from:idx,to:csI(r+dr,c+dc)});}
+    }
+  } else {
+    const dirs=[];
+    if(p.t==='R'||p.t==='Q')dirs.push(...[[0,1],[0,-1],[1,0],[-1,0]]);
+    if(p.t==='B'||p.t==='Q')dirs.push(...[[1,1],[1,-1],[-1,1],[-1,-1]]);
+    for(const[dr,dc]of dirs){
+      let nr=r+dr,nc=c+dc;
+      while(csOK(nr,nc)){
+        const tgt=board[csI(nr,nc)];
+        if(tgt){if(tgt.color!==p.color)moves.push({from:idx,to:csI(nr,nc)});break;}
+        moves.push({from:idx,to:csI(nr,nc)});nr+=dr;nc+=dc;
+      }
+    }
+  }
+  return moves;
+}
+
+// ── Apply move to a board copy ────────────────────────────────
+function csApplyMove(mv,board,cast,ep){
+  const b=board.slice();
+  const p={...b[mv.from]};
+  const newCast={...cast};
+  let newEP=null;
+  b[mv.to]=p;b[mv.from]=null;
+  if(mv.epCap!==undefined)b[mv.epCap]=null;
+  if(mv.ep2!==undefined)newEP=mv.ep2;
+  if(mv.castle){
+    const row=csR(mv.from);
+    if(mv.castle==='K'){b[csI(row,5)]={...b[csI(row,7)]};b[csI(row,7)]=null;}
+    else{b[csI(row,3)]={...b[csI(row,0)]};b[csI(row,0)]=null;}
+  }
+  if(mv.promo)b[mv.to]={t:mv.promo,color:p.color};
+  // Update castling rights
+  if(p.t==='K'){if(p.color==='w'){newCast.wK=false;newCast.wQ=false;}else{newCast.bK=false;newCast.bQ=false;}}
+  if(p.t==='R'){
+    if(mv.from===csI(7,0))newCast.wQ=false;if(mv.from===csI(7,7))newCast.wK=false;
+    if(mv.from===csI(0,0))newCast.bQ=false;if(mv.from===csI(0,7))newCast.bK=false;
+  }
+  if(mv.to===csI(7,0))newCast.wQ=false;if(mv.to===csI(7,7))newCast.wK=false;
+  if(mv.to===csI(0,0))newCast.bQ=false;if(mv.to===csI(0,7))newCast.bK=false;
+  return{board:b,cast:newCast,ep:newEP};
+}
+
+// ── Legal moves for a piece ───────────────────────────────────
+function csLegal(idx,board,cast,ep){
+  const p=board[idx];if(!p)return[];
+  const legal=csPseudo(idx,board,ep).filter(mv=>{
+    const{board:nb}=csApplyMove(mv,board,cast,ep);
+    return!csInCheck(p.color,nb);
+  });
+  // Castling
+  if(p.t==='K'&&!csInCheck(p.color,board)){
+    const row=p.color==='w'?7:0;const opp=csOpp(p.color);
+    if(cast[p.color+'K']&&!board[csI(row,5)]&&!board[csI(row,6)]&&
+       !csAttacked(csI(row,4),opp,board)&&!csAttacked(csI(row,5),opp,board)&&!csAttacked(csI(row,6),opp,board)){
+      legal.push({from:idx,to:csI(row,6),castle:'K'});
+    }
+    if(cast[p.color+'Q']&&!board[csI(row,3)]&&!board[csI(row,2)]&&!board[csI(row,1)]&&
+       !csAttacked(csI(row,4),opp,board)&&!csAttacked(csI(row,3),opp,board)&&!csAttacked(csI(row,2),opp,board)){
+      legal.push({from:idx,to:csI(row,2),castle:'Q'});
+    }
+  }
+  return legal;
+}
+
+// ── All legal moves for a color ───────────────────────────────
+function csAllLegal(color,board,cast,ep){
+  const moves=[];
+  for(let i=0;i<64;i++)if(board[i]&&board[i].color===color)moves.push(...csLegal(i,board,cast,ep));
+  return moves;
+}
+
+// ── Update game status after move ────────────────────────────
+function csUpdateStatus(){
+  const color=CHESS.turn;
+  const allMoves=csAllLegal(color,CHESS.board,CHESS.cast,CHESS.ep);
+  const inCheck=csInCheck(color,CHESS.board);
+  if(allMoves.length===0){
+    CHESS.status=inCheck?'checkmate':'stalemate';
+    CHESS.winner=inCheck?csOpp(color):null;
+    return;
+  }
+  // 50-move rule
+  if(CHESS.halfMoves>=100){CHESS.status='draw';return;}
+  // Threefold repetition
+  const key=csBoardKey();
+  if(CHESS.posHist.filter(k=>k===key).length>=3){CHESS.status='draw';return;}
+  // Insufficient material
+  const pieces=CHESS.board.filter(Boolean);
+  if(pieces.length<=3&&!pieces.some(p=>['R','Q','P'].includes(p.t))){CHESS.status='draw';return;}
+  CHESS.status=inCheck?'check':'playing';
+}
+
+// ── Click handler ─────────────────────────────────────────────
+function chessClick(idx){
+  if(CHESS.status==='checkmate'||CHESS.status==='stalemate'||CHESS.status==='draw'||CHESS.pendPromo)return;
+  if(APP.mode==='online'){
+    const myColor=CHESS.myColor||'w';
+    if(CHESS.turn!==myColor){sound('error');return;}
+  }
+  if(APP.mode==='bot'&&CHESS.turn==='b'){sound('error');return;}
+  const piece=CHESS.board[idx];
+  if(CHESS.sel!==null){
+    const mv=CHESS.lm.find(m=>m.to===idx);
+    if(mv){
+      const fromP=CHESS.board[CHESS.sel];
+      const toRow=csR(idx);
+      if(fromP&&fromP.t==='P'&&(toRow===0||toRow===7)){
+        showPromotion(CHESS.sel,idx,mv);return;
+      }
+      if(APP.mode==='online'){pushChessMove(CHESS.sel,idx,null);CHESS.sel=null;CHESS.lm=[];chessRender();return;}
+      doChessMove(mv,'Q');return;
+    }
+    if(piece&&piece.color===CHESS.turn){
+      CHESS.sel=idx;CHESS.lm=csLegal(idx,CHESS.board,CHESS.cast,CHESS.ep);chessRender();return;
+    }
+    CHESS.sel=null;CHESS.lm=[];chessRender();return;
+  }
+  if(piece&&piece.color===CHESS.turn){
+    CHESS.sel=idx;CHESS.lm=csLegal(idx,CHESS.board,CHESS.cast,CHESS.ep);chessRender();
+  }
+}
+
+function doChessMove(mv,promo){
+  const mvWithPromo={...mv};
+  if(promo&&CHESS.board[mv.from]&&CHESS.board[mv.from].t==='P'){
+    const toRow=csR(mv.to);if(toRow===0||toRow===7)mvWithPromo.promo=promo;
+  }
+  const result=csApplyMove(mvWithPromo,CHESS.board,CHESS.cast,CHESS.ep);
+  const p=CHESS.board[mv.from];
+  const captured=CHESS.board[mv.to]||(mvWithPromo.epCap!==undefined?CHESS.board[mvWithPromo.epCap]:null);
+  if(p&&p.t==='P'||captured)CHESS.halfMoves=0;else CHESS.halfMoves++;
+  if(p&&p.color==='b')CHESS.fullMoves++;
+  CHESS.board=result.board;CHESS.cast=result.cast;CHESS.ep=result.ep;
+  CHESS.lastFrom=mv.from;CHESS.lastTo=mv.to;
+  CHESS.turn=csOpp(CHESS.turn);
+  CHESS.sel=null;CHESS.lm=[];
+  CHESS.posHist.push(csBoardKey());
+  csUpdateStatus();
+  sound('chess');
+  if(CHESS.status==='check')sound('check');
+  chessRender();
+  // Check end conditions
+  if(CHESS.status==='checkmate'||CHESS.status==='stalemate'||CHESS.status==='draw'){
+    const winner=CHESS.status==='checkmate'?(CHESS.winner==='w'?'X':'O'):null;
+    sound('win');setTimeout(()=>showGameOver(winner,CHESS.status==='checkmate'?null:'draw'),700);return;
+  }
+  if(botTurn())setTimeout(()=>chessBotMove(),botDelay());
+}
+
+function showPromotion(from,to,mv){
+  CHESS.pendPromo={from,to,mv};
+  CHESS.sel=null;CHESS.lm=[];
+  const color=CHESS.board[from].color;
+  const choices=document.getElementById('promoChoices');
+  choices.innerHTML=['Q','R','B','N'].map(t=>`
+    <button class="promo-btn" onclick="completePromo('${t}')">
+      ${csPieceSVG(t,color,52)}
+    </button>`).join('');
+  document.getElementById('promoOverlay').classList.add('show');
+}
+
+function completePromo(t){
+  document.getElementById('promoOverlay').classList.remove('show');
+  const{from,to,mv}=CHESS.pendPromo;CHESS.pendPromo=null;
+  if(APP.mode==='online'){pushChessMove(from,to,t);chessRender();return;}
+  doChessMove(mv||{from,to},t);
+}
+
+// ── SVG Pieces ────────────────────────────────────────────────
+function csPieceSVG(type,color,size=38){
+  const fill=color==='w'?'var(--x)':'var(--o)';
+  const bg='var(--bg3)';
+  const glow=color==='w'?'#00f0ff':'#ff2d6b';
+  const shapes={
+    P:`<circle cx="18" cy="9" r="5.5" fill="${fill}"/>
+       <path d="M13 14 L11 30 L25 30 L23 14 Z" fill="${fill}"/>
+       <rect x="8" y="29" width="20" height="4" rx="1" fill="${fill}"/>`,
+    N:`<rect x="8" y="29" width="20" height="4" rx="1" fill="${fill}"/>
+       <polygon points="10,29 11,20 13,16 12,11 15,7 20,5 24,7 25,11 22,13 24,17 20,29" fill="${fill}"/>
+       <circle cx="22" cy="9" r="2.2" fill="${bg}"/>
+       <line x1="10" y1="22" x2="20" y2="22" stroke="${bg}" stroke-width="1.5"/>`,
+    B:`<circle cx="18" cy="7" r="4.5" fill="${fill}"/>
+       <circle cx="18" cy="7" r="2" fill="${bg}"/>
+       <line x1="18" y1="4" x2="18" y2="10" stroke="${bg}" stroke-width="1.5"/>
+       <path d="M14 11 L18 4 L22 11 L21 30 L15 30 Z" fill="${fill}"/>
+       <rect x="8" y="29" width="20" height="4" rx="1" fill="${fill}"/>
+       <line x1="12" y1="22" x2="24" y2="18" stroke="${bg}" stroke-width="1.2"/>`,
+    R:`<rect x="9" y="5" width="4" height="9" rx="1" fill="${fill}"/>
+       <rect x="16" y="5" width="4" height="9" rx="1" fill="${fill}"/>
+       <rect x="23" y="5" width="4" height="9" rx="1" fill="${fill}"/>
+       <rect x="11" y="12" width="14" height="17" fill="${fill}"/>
+       <rect x="8" y="29" width="20" height="4" rx="1" fill="${fill}"/>`,
+    Q:`<circle cx="18" cy="5" r="3.5" fill="${fill}"/>
+       <circle cx="9" cy="10" r="2.8" fill="${fill}"/>
+       <circle cx="27" cy="10" r="2.8" fill="${fill}"/>
+       <circle cx="18" cy="10" r="2.8" fill="${fill}"/>
+       <path d="M6 14 L9 10 L12 17 L18 5 L24 17 L27 10 L30 14 L27 30 L9 30 Z" fill="${fill}"/>
+       <rect x="8" y="29" width="20" height="4" rx="1" fill="${fill}"/>`,
+    K:`<rect x="15.5" y="2" width="5" height="11" rx="1.5" fill="${fill}"/>
+       <rect x="11" y="5" width="14" height="5" rx="1.5" fill="${fill}"/>
+       <path d="M11 14 L25 14 L27 30 L9 30 Z" fill="${fill}"/>
+       <rect x="8" y="29" width="20" height="4" rx="1" fill="${fill}"/>`
+  };
+  return `<svg viewBox="0 0 36 36" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 3px ${glow}60)">${shapes[type]||''}</svg>`;
+}
+
+// ── Render ────────────────────────────────────────────────────
+function chessRender(){
+  const bc=document.getElementById('boardContainer');
+  const fl=CHESS.flipped;
+  const files='abcdefgh';
+  let html='<div class="chess-outer"><div class="chess-board-row"><div class="chess-rank-col">';
+  for(let ri=0;ri<8;ri++){
+    const rank=fl?ri+1:8-ri;
+    html+=`<div class="chess-rank-lbl">${rank}</div>`;
+  }
+  html+='</div><div class="chess-board">';
+  for(let ri=0;ri<8;ri++){
+    for(let ci=0;ci<8;ci++){
+      const r=fl?7-ri:ri,c=fl?7-ci:ci;
+      const idx=csI(r,c);
+      const p=CHESS.board[idx];
+      const isLight=(r+c)%2===0;
+      const isSel=CHESS.sel===idx;
+      const isVM=CHESS.lm.some(m=>m.to===idx);
+      const isLM=(CHESS.lastFrom===idx||CHESS.lastTo===idx)&&CHESS.lastFrom>=0;
+      const isCheck=p&&p.t==='K'&&p.color===CHESS.turn&&CHESS.status==='check';
+      let cls=`csq ${isLight?'csq-light':'csq-dark'}`;
+      if(isSel)cls+=' csq-sel';
+      if(isLM)cls+=' csq-lm';
+      if(isCheck)cls+=' csq-check';
+      html+=`<div class="${cls}" onclick="chessClick(${idx})">`;
+      if(isVM){
+        if(p&&p.color!==CHESS.turn)html+=`<div class="cs-ring"></div>`;
+        else html+=`<div class="cs-dot"></div>`;
+      }
+      if(p)html+=`<div class="cs-piece">${csPieceSVG(p.t,p.color)}</div>`;
+      html+='</div>';
+    }
+  }
+  html+='</div></div>';
+  html+='<div class="chess-file-row">';
+  for(let ci=0;ci<8;ci++){
+    const c=fl?7-ci:ci;
+    html+=`<div class="chess-file-lbl">${files[c]}</div>`;
+  }
+  html+='</div>';
+  const turnName=CHESS.turn==='w'?document.getElementById('pNameX').textContent:document.getElementById('pNameO').textContent;
+  const statusMsg={
+    playing:`${turnName} to move`,
+    check:`CHECK — ${turnName} to move`,
+    checkmate:'CHECKMATE',
+    stalemate:'STALEMATE',
+    draw:'DRAW'
+  }[CHESS.status]||'';
+  html+=`<div class="chess-controls">
+    <button class="btn sm" onclick="CHESS.flipped=!CHESS.flipped;chessRender()">Flip Board</button>
+  </div>
+  <div class="chess-status${CHESS.status==='check'?' cs-check':''}">${statusMsg}</div>
+  </div>`;
+  bc.innerHTML=html;
+  refreshTurnBar();
+}
+
+// ── Chess Bot ─────────────────────────────────────────────────
+const CS_VAL={P:100,N:320,B:330,R:500,Q:900,K:20000};
+// Piece-square tables (simplified, from white's perspective)
+const CS_PST={
+  P:[0,0,0,0,0,0,0,0,5,10,10,-20,-20,10,10,5,5,-5,-10,0,0,-10,-5,5,0,0,0,20,20,0,0,0,5,5,10,25,25,10,5,5,10,10,20,30,30,20,10,10,50,50,50,50,50,50,50,50,0,0,0,0,0,0,0,0],
+  N:[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,5,5,0,-20,-40,-30,5,10,15,15,10,5,-30,-30,0,15,20,20,15,0,-30,-30,5,15,20,20,15,5,-30,-30,0,10,15,15,10,0,-30,-40,-20,0,0,0,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50],
+  B:[-20,-10,-10,-10,-10,-10,-10,-20,-10,5,0,0,0,0,5,-10,-10,10,10,10,10,10,10,-10,-10,0,10,10,10,10,0,-10,-10,5,5,10,10,5,5,-10,-10,0,5,10,10,5,0,-10,-10,0,0,0,0,0,0,-10,-20,-10,-10,-10,-10,-10,-10,-20],
+  R:[0,0,0,5,5,0,0,0,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,5,10,10,10,10,10,10,5,0,0,0,0,0,0,0,0],
+  Q:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,5,0,0,0,0,-10,-10,5,5,5,5,5,0,-10,0,0,5,5,5,5,0,-5,-5,0,5,5,5,5,0,-5,-10,0,5,5,5,5,0,-10,-10,0,0,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
+  K:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20]
+};
+function csPST(type,color,sq){
+  const tbl=CS_PST[type];if(!tbl)return 0;
+  const idx=color==='w'?sq:(63-sq);
+  return tbl[idx]||0;
+}
+function csBoardEval(board,color){
+  let score=0;
+  board.forEach((p,sq)=>{
+    if(!p)return;
+    const v=(CS_VAL[p.t]||0)+(csPST(p.t,p.color,sq)||0);
+    score+=p.color===color?v:-v;
+  });
+  return score;
+}
+function chessBotMove(){
+  const diff=TOUR_STATE?.isBot?TOUR_STATE.botDiff:APP.botDiff;
+  const botColor='b';
+  const moves=csAllLegal(botColor,CHESS.board,CHESS.cast,CHESS.ep);
+  if(!moves.length)return;
+  let chosen;
+  if(diff==='easy'){
+    chosen=moves[Math.floor(Math.random()*moves.length)];
+  } else if(diff==='medium'){
+    // Basic: win immediately, else avoid blunders, else random
+    for(const mv of moves){
+      const{board:nb}=csApplyMove(mv,CHESS.board,CHESS.cast,CHESS.ep);
+      if(!csAllLegal('w',nb,CHESS.cast,null).length&&csInCheck('w',nb)){chosen=mv;break;}
+    }
+    if(!chosen){
+      let best=-Infinity;
+      for(const mv of moves){
+        const{board:nb,cast:nc,ep:ne}=csApplyMove(mv,CHESS.board,CHESS.cast,CHESS.ep);
+        const score=csBoardEval(nb,botColor);
+        if(score>best){best=score;chosen=mv;}
+      }
+    }
+  } else {
+    // Hard: minimax depth 3
+    const result=csMinimax(CHESS.board,CHESS.cast,CHESS.ep,3,-Infinity,Infinity,true,botColor);
+    chosen=result.move||moves[0];
+  }
+  if(!chosen)return;
+  const fromP=CHESS.board[chosen.from];
+  const toRow=csR(chosen.to);
+  const promo=(fromP&&fromP.t==='P'&&(toRow===0||toRow===7))?'Q':null;
+  if(promo)chosen={...chosen,promo};
+  doChessMove(chosen,promo||'Q');
+}
+function csMinimax(board,cast,ep,depth,alpha,beta,maximizing,botColor){
+  const color=maximizing?botColor:csOpp(botColor);
+  const moves=csAllLegal(color,board,cast,ep);
+  if(!moves.length||depth===0){return{score:csBoardEval(board,botColor)};}
+  // Sort: captures first
+  moves.sort((a,b)=>(board[b.to]?1:0)-(board[a.to]?1:0));
+  let best=maximizing?{score:-Infinity}:{score:Infinity};
+  for(const mv of moves){
+    const{board:nb,cast:nc,ep:ne}=csApplyMove(mv,board,cast,ep);
+    const result=csMinimax(nb,nc,ne,depth-1,alpha,beta,!maximizing,botColor);
+    if(maximizing&&result.score>best.score){best={score:result.score,move:mv};}
+    if(!maximizing&&result.score<best.score){best={score:result.score,move:mv};}
+    if(maximizing)alpha=Math.max(alpha,result.score);
+    else beta=Math.min(beta,result.score);
+    if(alpha>=beta)break;
+  }
+  return best;
+}
+
+// ── Online Chess Push/Sync ────────────────────────────────────
+async function pushChessMove(from,to,promo){
+  const mv=CHESS.lm.find(m=>m.from===from&&m.to===to)||{from,to};
+  const mvFull=promo?{...mv,promo}:mv;
+  const fromP=CHESS.board[from];
+  const toRow=csR(to);
+  if(!promo&&fromP&&fromP.t==='P'&&(toRow===0||toRow===7)){
+    CHESS.pendPromo={from,to,mv:mvFull};
+    CHESS.sel=null;CHESS.lm=[];
+    const color=fromP.color;
+    const choices=document.getElementById('promoChoices');
+    choices.innerHTML=['Q','R','B','N'].map(t=>`<button class="promo-btn" onclick="completePromo('${t}')">${csPieceSVG(t,color,52)}</button>`).join('');
+    document.getElementById('promoOverlay').classList.add('show');
+    return;
+  }
+  const result=csApplyMove(mvFull,CHESS.board,CHESS.cast,CHESS.ep);
+  const captured=CHESS.board[to]||(mvFull.epCap!==undefined?CHESS.board[mvFull.epCap]:null);
+  const newHalf=(fromP&&fromP.t==='P'||captured)?0:CHESS.halfMoves+1;
+  const newTurn=csOpp(CHESS.board[from].color);
+  // Serialize board
+  const boardObj={};result.board.forEach((p,i)=>{if(p)boardObj[i]=p.t+p.color;});
+  const upd={
+    csBoard:boardObj,csTurn:newTurn,
+    csEP:result.ep,csHalf:newHalf,
+    csLastFrom:from,csLastTo:to,
+    csCast:result.cast
+  };
+  // Check for game end
+  const testBoard=result.board;
+  const allNext=csAllLegal(newTurn,testBoard,result.cast,result.ep);
+  const inCk=csInCheck(newTurn,testBoard);
+  if(!allNext.length){upd.csStatus=inCk?'checkmate':'stalemate';upd.csWinner=inCk?csOpp(newTurn):'';}
+  else upd.csStatus=inCk?'check':'playing';
+  await fbUpd(ONLINE.gameRef,upd);
+  sound('chess');
+  if(upd.csStatus==='check')sound('check');
+}
+
+function syncChessState(d){
+  if(!d.csBoard)return;
+  const board=Array(64).fill(null);
+  Object.entries(d.csBoard).forEach(([k,v])=>{board[+k]={t:v[0],color:v[1]};});
+  CHESS.board=board;
+  CHESS.turn=d.csTurn||'w';
+  CHESS.ep=d.csEP||null;
+  CHESS.halfMoves=d.csHalf||0;
+  CHESS.lastFrom=d.csLastFrom!=null?d.csLastFrom:-1;
+  CHESS.lastTo=d.csLastTo!=null?d.csLastTo:-1;
+  if(d.csCast)CHESS.cast=d.csCast;
+  CHESS.status=d.csStatus||'playing';
+  CHESS.winner=d.csWinner||null;
+  CHESS.sel=null;CHESS.lm=[];
+  chessRender();
+  refreshTurnBar();
+  if(CHESS.status==='checkmate'||CHESS.status==='stalemate'||CHESS.status==='draw'){
+    const winner=CHESS.status==='checkmate'?(CHESS.winner==='w'?'X':'O'):null;
+    if(ONLINE.myRole)recordResult('chess',ONLINE.myRole===(winner)?'win':winner?'loss':'draw');
+    setTimeout(()=>showGameOver(winner,CHESS.status==='checkmate'?null:'draw'),700);
+  }
+}
+
+// ── Sound for chess ───────────────────────────────────────────
+// (chess and check sound added in main sound function below)
+
 </script>
 </body>
 </html>
